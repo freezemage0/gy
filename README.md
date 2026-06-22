@@ -9,7 +9,7 @@ Gy – это небольшой php framework, который включает 
 
 ### Системные требования:
 - php, необходимо скомпилировать с графической библиотекой GD, тестировалась на версиях:<br/>
-    5.6, 7.0, 7.1, 7.2 .
+    5.6, 7.0, 7.1, 7.2, 8.3 .
 - Поддерживаются базы данных (протестированы):
   -	mySQL 5.6 ;
   -	MariaDB-10.3 ;
@@ -46,17 +46,19 @@ https://github.com/ssv32/gy/wiki</p>
  
 ### Пример подключения gy php framework
 
-    <?
-    include "./gy/gy.php"; // подключить ядро // include core
+    
+    <?php 
+    include $_SERVER["DOCUMENT_ROOT"]."/gy/gy.php"; // подключить ядро // include core
 
 ### Пример проверки подключено ли ядро gy php framework
 
-    <?if ( !defined("GY_CORE") && (GY_CORE !== true) ) die( "gy: err include core" );?>
+    <?php
+    if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
 ### Пример вызова компонента:
 
-    <?
-    include "./gy/gy.php"; // подключить ядро 
+    <?php 
+    include $_SERVER["DOCUMENT_ROOT"]."/gy/gy.php"; // подключить ядро // include core
     
     // пример вызова компонента 
     $app->component(
@@ -123,17 +125,19 @@ https://github.com/ssv32/gy/wiki </p>
  
 ### Example сonnection gy php framework
 
-    <?
-    include "./gy/gy.php"; // подключить ядро // include core
+    <?php 
+    include $_SERVER["DOCUMENT_ROOT"]."/gy/gy.php"; // подключить ядро // include core
 
 ### Example of checking if the kernel is connected gy php framework
 
-    <?if ( !defined("GY_CORE") && (GY_CORE !== true) ) die( "gy: err include core" );?>
+    <?php
+    if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
+
 
 ### Example run component:
 
-    <?
-    include "./gy/gy.php"; // include core
+    <?php 
+    include $_SERVER["DOCUMENT_ROOT"]."/gy/gy.php"; // include core
     
     // example run component
     $app->component(

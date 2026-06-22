@@ -40,8 +40,11 @@ if ($isRunConsole) {
 //            } else {
 //                $lang = 'rus';
 //            }
-            
-            
+
+
+            global $LANG; 
+            $lang = $LANG; // быстрый фикс, что бы заработало
+
             // записать основную страницу
             file_put_contents(__DIR__.'/../../index.php', getCodeByUrlPage('index.php', $lang));
 

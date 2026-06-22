@@ -22,8 +22,8 @@ if ($isRunConsole) {
         'container_data',
         array( 
             'id int PRIMARY KEY AUTO_INCREMENT', 
-            'name varchar(50)', 
-            'code varchar(50)', 
+            'name varchar(64)', 
+            'code varchar(64)', 
         )
     );
 
@@ -33,8 +33,8 @@ if ($isRunConsole) {
             'id int PRIMARY KEY AUTO_INCREMENT',
             'id_type_property int',
             'id_container_data int',
-            'code varchar(50)',
-            'name varchar(50)',
+            'code varchar(64)',
+            'name varchar(64)',
         )
     );
 
@@ -42,10 +42,10 @@ if ($isRunConsole) {
         'types_property_container_data',
         array(
             'id int PRIMARY KEY AUTO_INCREMENT',
-            'info varchar(50)',
-            'code varchar(50)',
-            'name varchar(50)',
-            'name_table varchar(50)'
+            'info varchar(64)',
+            'code varchar(64)',
+            'name varchar(64)',
+            'name_table varchar(64)'
         )
     );
 
@@ -84,8 +84,8 @@ if ($isRunConsole) {
         array(
             'id int PRIMARY KEY AUTO_INCREMENT',
             'section_id int',
-            'code varchar(50)',
-            'name varchar(50)',
+            'code varchar(64)',
+            'name varchar(64)',
             'id_container_data int',
         )
     );

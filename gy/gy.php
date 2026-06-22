@@ -91,7 +91,7 @@ if ( !defined("GY_CORE") ) {
 
     global $APP;
     // добавлю версию ядра gy
-    $gyConfig['v-gy'] = '0.3-alpha';
+    $gyConfig['v-gy'] = '0.4-alpha';
     $APP = App::createApp($URL_PROJECT, $gyConfig);
     unset($gyConfig);
 
