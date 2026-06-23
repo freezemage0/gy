@@ -1,12 +1,12 @@
 <?php
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
-use Gy\Core\Lang;
+use Gy\Core\Localization;
 
 global $APP;
 global $USER;
 
-$langTextThisFile = new Lang(
+$langTextThisFile = new Localization(
     $APP->urlProject."/gy/lang", 
     'header-admin', 
     $APP->options['lang']
@@ -54,7 +54,7 @@ $langTextThisFile = new Lang(
             }
 
             // надо добавить пункты меню заданные в подключенных модулях
-            $module = Gy\Core\Module::getInstance();
+            $module = Gy\Core\ModuleManager::getInstance();
             foreach ($module->getButtonsMenuAllModules() as $nameModule => $arButton) {
                 // условия показа пункта меню (задаётся модулем) или если админ
                 if (

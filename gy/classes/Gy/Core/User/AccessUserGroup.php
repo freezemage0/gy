@@ -15,7 +15,7 @@ class AccessUserGroup
     private static $tableNameUserActions = 'action_user';
     private static $tableNameUsersInGroupss = 'users_in_groups';
 
-    private static $cacheTimeGetData = 604800;
+    private static $cacheTimeGetData = 604_800;
 
     /**
      * checkAccessUserGroupsByUserAction - определить можно ли пользователю 

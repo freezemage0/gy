@@ -1,90 +1,66 @@
-<?php 
+<?php
+
+declare(strict_types=1);
 
 namespace Gy\Core;
 
 use Gy\Core\Component\Component;
-use Gy\Core\Lang;
-use Gy\Core\Security;
-
-if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
 final class App
 {
-
-    public $url;
-    public $options; // настройки проекта
-    public $lang; // табличка с языковыми сообщениями
+    public string $coreDirectory;
+    // настройки проекта
+    public Localization $lang;       // табличка с языковыми сообщениями
     //public $db; // db
     public $urlProject; // урл как $this-url только без /gy в конце
 
-    private static $APP;
-
-    private function  __construct($url, $options)
-    {
-        // подключить настройки
-        $this->options = $options;
-        
+    public function __construct(
+        public readonly Configuration $configuration,
+    ) {
         // записать ещё путь c /gy
-        $this->url = $url.'/gy';
-        
-        // путь до проекта
-        $this->urlProject = $url;
-        
+        $this->coreDirectory = $this->configuration->projectRoot . '/gy';
+
         // если есть языковой файл то надо подключить его
-        $this->lang = new Lang($url, 'app', $this->options['lang']);
+        $this->lang = new Localization($this->coreDirectory, 'app', $this->configuration->language);
     }
 
     /**
-     * createApp - создать объект класса app, запишет его в статичное свойство и вернёт
-     * @param string $url - расположение проекта
-     * @return object class app
-     */
-    public static function createApp($url, $options)
-    {
-        if (static::$APP === null) {
-            static::$APP = new static($url, $options);
-        }
-        return static::$APP;
-    }
-
-    /** 
      *  component отобразить компонент // show component
-     *  @param string $name - имя компонента и контроллера сразу 
-     *  @param string $template - имя шаблона 
-     *  @param array $arParam - параметры компонента (параметры кеша и прочие нюансы) 
+     *
+     * @param string $name - имя компонента и контроллера сразу
+     * @param string $template - имя шаблона
+     * @param array $parameters - параметры компонента (параметры кеша и прочие нюансы)
      *      // array component config
-     *  @param strung $url - url где лежит проект
      *  вернёт объект компонент
-     * 
-     * TODO возможно понадобится сделать подключение модели 
+     *
+     * TODO возможно понадобится сделать подключение модели
      *     // если делать универсальные модели для компонентов
      *  или возможность подключать много моделей разных
      *  maybe includ many model in component
      */
-    public function component($name, $template, $arParam)
+    public function component(string $name, string $template, array $parameters): Component
     {
-        if ($name != 'includeHtml') {
+        if ($name !== 'includeHtml') {
             // обезопасим входные параметры
-            $arParam = Security::filterInputData($arParam);
+            $parameters = Security::filterInputData($parameters);
         }
 
-        $component = new Component(
-            $name, 
-            $template, 
-            $arParam, 
-            $this->urlProject, 
-            $this->options['lang']
+        return new Component(
+            name: $name,
+            template: $template,
+            arParam: $parameters,
+            url: $this->urlProject,
+            lang: $this->configuration['lang'],
         );
-        return $component;
     }
 
     /**
      * getAllUrlTisPage()
      *  - вернёт полный путь к текущей страницы (вместе с get параметрами)
-     * 
+     *
      * @return string
      */
-    public function getAllUrlTisPage()
+    public function getAllUrlTisPage(): string
     {
         return $_SERVER['REQUEST_URI'];
     }
@@ -92,13 +68,11 @@ final class App
     /**
      * getUrlTisPageNotGetProperty()
      *  - вернёт полный путь к текущей страницы (без get параметров)
-     * 
+     *
      * @return string
      */
-    public function getUrlTisPageNotGetProperty()
+    public function getUrlTisPageNotGetProperty(): string
     {
         return $_SERVER['SCRIPT_NAME'];
     }
-
-
 }

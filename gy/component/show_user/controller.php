@@ -1,7 +1,7 @@
 <?php 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
-use Gy\Core\User\GeneralUsersPropertys;
+use Gy\Core\User\UserPropertyStorage;
 
 if (!empty($this->arParam['id']) && is_numeric($this->arParam['id'])) {
     global $USER;
@@ -30,10 +30,10 @@ if (!empty($this->arParam['id']) && is_numeric($this->arParam['id'])) {
         // получить свойства и значения
         
         // получить все общие свойства пользователей которые были созданы
-        $allUsersCreatePropertys = generalUsersPropertys::getAllGeneralUsersPropertys();
+        $allUsersCreatePropertys = UserPropertyStorage::getAllGeneralUsersPropertys();
 
         // получить значения свойств конкретного пользователя
-        $valuePropertysThisUser = generalUsersPropertys::getAllValueUserProperty( $this->arParam['id'], 'text'); // text - т.к. пока только такие типы свойств реализованы
+        $valuePropertysThisUser = UserPropertyStorage::getAllValueUserProperty( $this->arParam['id'], 'text'); // text - т.к. пока только такие типы свойств реализованы
 
         // собираю общий массив
         $propertys = array();

@@ -1,7 +1,7 @@
 <?php 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
-use Gy\Core\Capcha;
+use Gy\Core\Captcha;
 //use Gy\Core\User\AccessUserGroup;
 
 // контроллер компонента form_auth (форма авторизации)
@@ -43,9 +43,9 @@ if ($isShowAdminPanel === true){
 
 } elseif (!empty($_REQUEST['auth']) && !empty($_REQUEST['pass']) && !empty($_REQUEST['capcha'])) {
 
-    $capcha = new Capcha($APP->url.Capcha::$defaultUrlFonts);
+    $capcha = new Captcha($APP->url.Captcha::$defaultUrlFonts);
     
-    if ($capcha->chackCapcha($_REQUEST['capcha'])) {
+    if ($capcha->validate($_REQUEST['capcha'])) {
 
         $USER->authorized($_REQUEST['auth'], $_REQUEST['pass']);
         $isShowAdminPanel = Gy\Core\User\AccessUserGroup::accessThisUserByAction( 'show_admin_panel');

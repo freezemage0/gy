@@ -1,4 +1,7 @@
-<?php 
+<?php
+
+use Gy\Core\ServiceLocator;
+
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
 $data  = $_REQUEST;
@@ -54,14 +57,14 @@ if (!empty($data[$this->lang->getMessage('button')]) && ($data[$this->lang->getM
         if ($USER->addUsers($arDaraUser)) {
             // найти id добавленного пользователя
             global $DB;
-            global $CRYPTO;
+            $cryptoService = ServiceLocator::getInstance()->getCryptoService();
             $res = $DB->selectDb(
                 $USER->tableName,
                 array('*'),
                 array(
                     'AND' => array(
                         array('=' => array('login', "'".$arDaraUser['login']."'")),
-                        array('=' => array('pass', "'".md5($arDaraUser['pass'].$CRYPTO->getSole())."'") )
+                        array('=' => array('pass', "'".md5($arDaraUser['pass'].$cryptoService->getSalt())."'") )
                     )
                 )
             );

@@ -104,13 +104,14 @@ class Pagination
     
     public static function getPaginationType1($data, $countNewsIn1Page)
     {
-        $allPages = ceil(count($data) / $countNewsIn1Page); 
-        return self::getHtmlPaginationType1($allPages, self::getNumberThisPagePagination());
+        return self::getHtmlPaginationType1(
+            \ceil(\count($data) / $countNewsIn1Page),
+            self::getNumberThisPagePagination()
+        );
     }
     
     public static function getDataFrom1Page($data, $countNewsIn1Page){
-        $data = array_slice($data, ((self::getNumberThisPagePagination() * $countNewsIn1Page) - $countNewsIn1Page), $countNewsIn1Page);
-        return $data;
+        return array_slice($data, ((self::getNumberThisPagePagination() * $countNewsIn1Page) - $countNewsIn1Page), $countNewsIn1Page);
     }
 }
 

@@ -6,27 +6,24 @@ if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
 class Crypto
 {
-
-    private $sole;
+    private string $salt;
 
     /**
      * setSole - установить соль (некая строка)
-     * @param string $sole
-     * @return boolean true
+     * @param string $salt
      */
-    public function setSole($sole)
+    public function setSalt(string $salt): void
     {
-        $this->sole = $sole;
-        return true;
+        $this->salt = $salt;
     }
 
     /**
      * getSole - получить значение соли
      * @return string
      */
-    public function getSole()
+    public function getSalt(): string
     {
-        return $this->sole;
+        return $this->salt;
     }
 
     /**
@@ -35,7 +32,7 @@ class Crypto
      */
     public function getRandString()
     {
-        return md5(microtime().$this->sole);
+        return md5(microtime().$this->salt);
     }
 
     /**
@@ -48,9 +45,8 @@ class Crypto
      */
     public function getStringForUserCookie($login, $name, $id)
     {
-        return md5(microtime().$login.$this->sole.$name.$id);
+        return md5(microtime().$login.$this->salt.$name.$id);
     }
-
 }
 
 

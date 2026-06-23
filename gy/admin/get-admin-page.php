@@ -2,7 +2,7 @@
 include "../../gy/gy.php"; // подключить ядро // include core
 
 global $USER;
-$module = Gy\Core\Module::getInstance();
+$module = Gy\Core\ModuleManager::getInstance();
 global $APP;
 
 $data  = $_GET;

@@ -2,8 +2,8 @@
 
 namespace Gy\Core\Component;
 
-use Gy\Core\Lang;
-use Gy\Core\Module;
+use Gy\Core\Localization;
+use Gy\Core\ModuleManager;
 use Gy\Core\Component\Mvc\Controller;
 use Gy\Core\Component\Mvc\Model;
 use Gy\Core\Component\Mvc\Template;
@@ -21,7 +21,7 @@ class Component
 
     public function __construct( $name, $template, $arParam, $url, $lang )
     {
-        $this->lang = new Lang($url.'/gy/lang/', 'component', $lang);
+        $this->lang = new Localization($url.'/gy/lang/', 'component', $lang);
 
         // TODO $template - сюда можно и пустую строку записать
         // могут быть разные шаблоны
@@ -30,7 +30,7 @@ class Component
         $errText = '';
 
         // нужно попробовать найти подключаемый компонент среди подключённых модулей
-        $module = Module::getInstance();
+        $module = ModuleManager::getInstance();
         $urlComponentInModule = $module->getModulesComponent($name);
 
         if (($err == 0) && file_exists($url.'/customDir/component/'.$name.'/teplates/'.$template.'/template.php' )) {

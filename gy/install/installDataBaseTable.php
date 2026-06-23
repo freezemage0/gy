@@ -245,7 +245,7 @@ if ($isRunConsole) {
     echo $BR.'install all modules db = start';
 
     // теперь установка частей БД относящихся к модулям
-    $module = Gy\Core\Module::getInstance();
+    $module = Gy\Core\ModuleManager::getInstance();
     $module->installBdAllModules();
 
     echo $BR.'install all modules db = OK!';

@@ -3,66 +3,90 @@
 namespace Gy\Core\Cache;
 
 use Gy\Core\AbstractClasses\Cache;
+use RuntimeException;
 
-if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
+if (!defined("GY_CORE") && (GY_CORE !== true)) {
+    die("gy: err include core");
+}
 
 /**
  * cache - класс для работы с кешем
  * для даботы нужен раздел gy/cache/
  */
-class CacheFiles extends Cache 
+class CacheFiles extends Cache
 {
-    private $urlCache = '/cache/';
-    private $urlProject = '/';
-    private $data = array();
-    private $cacheName = 'noneme';
-    private $cacheTime = '';
-    private $endUrl = '.php';
+    private string $cacheUrl = '/cache/';
+    private array $data = [];
+    private string $key = 'noneme';
+    private int $expiresIn = 86_400; // In seconds.
+    private string $endUrl = '.php';
 
     /**
-     * 
-     * @param type $urlProject - путь к проекту
+     *
+     * @param type $projectUrl - путь к проекту
      */
-    public function __construct($urlProject)
+    public function __construct(
+        private readonly string $projectUrl = '/',
+    ) {}
+
+    private function createCacheDirectory(): void
     {
-        $this->urlProject = $urlProject;
-        if (!file_exists($this->urlProject.$this->urlCache)) {
-             mkdir($this->urlProject.$this->urlCache, 0755, true);
+        $cacheDirectory = $this->projectUrl . $this->cacheUrl;
+
+        if (\is_dir($cacheDirectory)) {
+            return;
+        }
+
+        try {
+            \set_error_handler(static fn() => true);
+            $result = \mkdir($cacheDirectory, 0755, true);
+        } finally {
+            \restore_error_handler();
+        }
+
+        if (!$result) {
+            throw new RuntimeException('Failed to create cache directory');
         }
     }
 
     /**
      * cacheInit - инициализация кеша, надо проверить есть кеш по заданным параметрам
-     * @param string $cacheName
-     * @param int $cacheTime - время кеширования в секундах
+     * @param string $key
+     * @param int $expiresIn - время кеширования в секундах
      * @return boolean
      */
-    public function cacheInit($cacheName, $cacheTime)
+    public function cacheInit(string $key, int $expiresIn): bool
     {
-        $this->cacheName = $cacheName;
-        $this->cacheTime = $cacheTime;
+        $this->createCacheDirectory();
 
-        if (file_exists($this->urlProject.$this->urlCache.$this->cacheName.$this->endUrl)) {
-            $cacheData = array();
-            include $this->urlProject.$this->urlCache.$this->cacheName.$this->endUrl;
+        $this->key = $key;
+        $this->expiresIn = $expiresIn;
 
-            if (!empty($cacheData)) {
-                $cacheData = json_decode($cacheData, true);
-                if (((int) $cacheData['createTime'] + (int) $cacheData['cacheTime']) > time()) {
-                    $this->data = $cacheData['data'];
-                    unset($cacheData);
-                }
-            }
+        if (!\is_file($this->projectUrl . $this->cacheUrl . $this->key . $this->endUrl)) {
+            return false;
         }
 
-        return !empty($this->data);
+        $cacheData = include $this->projectUrl . $this->cacheUrl . $this->key . $this->endUrl;
+
+        if (!empty($cacheData)) {
+            $cacheData = json_decode($cacheData, true);
+
+            $expiresAt = (int)$cacheData['createTime'] + (int)$cacheData['cacheTime'];
+            if ($expiresAt <= \time()) {
+                return false;
+            }
+
+            $this->data = $cacheData['data'];
+        }
+
+        return $this->data !== [];
     }
 
     /**
      * getCacheData - получить данные из кеша
-     * @return mixed - может быть массив или одиночное значение любого типа
+     * @return scalar|array - может быть массив или одиночное значение любого типа
      */
-    public function getCacheData()
+    public function getData(): int|string|bool|float|array
     {
         return $this->data;
     }
@@ -72,30 +96,29 @@ class CacheFiles extends Cache
      * @param mixed $data - может быть массив или одиночное значение
      * @return boolean true
      */
-    public function setCacheData($data)
+    public function setData(mixed $data): void
     {
-        $cacheData = array(
+        $cacheData = [
             'data' => $data,
             'createTime' => time(),
-            'cacheTime' => $this->cacheTime
-        );
-       
-        file_put_contents(
-            $this->urlProject.$this->urlCache.$this->cacheName.$this->endUrl, 
-            '<?php $cacheData = '."'". json_encode($cacheData)."';" 
-        );
+            'cacheTime' => $this->expiresIn,
+        ];
 
-        return true;
+        \file_put_contents(
+            $this->projectUrl . $this->cacheUrl . $this->key . $this->endUrl,
+            '<?php return ' . "'" . \json_encode($cacheData) . "';",
+        );
     }
 
     /**
      * clearThisCache - удалит текущий кеш (кеш связанный с текущим объектом)
      */
-    public function clearThisCache()
+    public function clear(): void
     {
-        if (file_exists($this->urlProject.$this->urlCache.$this->cacheName.$this->endUrl)) {
-            unlink($this->urlProject.$this->urlCache.$this->cacheName.$this->endUrl);
+        $cacheFile = $this->projectUrl . $this->cacheUrl . $this->key . $this->endUrl;
+
+        if (\is_file($cacheFile)) {
+            \unlink($cacheFile);
         }
     }
-
 }

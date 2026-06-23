@@ -41,11 +41,7 @@ class Security
      */
     private static function clearValue($value)
     {
-        $value = trim($value);
-        $value = stripslashes($value);
-        $value = strip_tags($value);
-        $value = htmlspecialchars($value);
-        return $value;
+        return htmlspecialchars(strip_tags(stripslashes(trim($value))));
     }
 
 

@@ -3,6 +3,7 @@
 namespace Gy\Core\Db;
 
 use Gy\Core\AbstractClasses\Db;
+use Gy\Core\ServiceLocator;
 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
@@ -296,14 +297,15 @@ class MySql extends Db
         $query = '';
 
         // разбить параметры на два списка через запятую // TODO вынести куда то
-        global $CRYPTO;
+        $cryptoService = ServiceLocator::getInstance()->getCryptoService();
+
         $nameProperty = '';
         $valueProperty = '';
         foreach ($propertys as $key=> $val) {
             $nameProperty .= (($nameProperty != '')? ', ': '').$key;
 
             if ($key == 'pass') {
-                $val = md5($val.$CRYPTO->getSole());
+                $val = md5($val.$cryptoService->getSalt());
             }
 
             if (!is_numeric($val)) {
@@ -330,11 +332,11 @@ class MySql extends Db
     {
         $query = 'UPDATE ';
         $textPropertys = '';
-        global $CRYPTO;
+        global $cryptoService;
         foreach ($propertys as $key => $val){
 
             if ($key == 'pass') {
-                $val = md5($val.$CRYPTO->getSole());
+                $val = md5($val.$cryptoService->getSole());
             }
 
             if (!is_numeric($val)) {

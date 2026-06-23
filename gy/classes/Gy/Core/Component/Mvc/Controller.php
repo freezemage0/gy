@@ -1,9 +1,7 @@
 <?php 
 namespace Gy\Core\Component\Mvc;
 
-use Gy\Core\Lang;
-
-if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
+use Gy\Core\Localization;
 
 class Controller
 {
@@ -16,7 +14,7 @@ class Controller
     public function __construct($url, $lang)
     {
         $this->controller = $url.'/controller.php';
-        $this->lang = new Lang($url, 'controller', $lang);
+        $this->lang = new Localization($url, 'controller', $lang);
     }
 
     /**

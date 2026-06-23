@@ -1,11 +1,11 @@
 <?php
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
-use Gy\Core\Lang;
+use Gy\Core\Localization;
 
 global $APP;
 $utlThisComponent = "/gy/component/users_all_tables/";
-$langComponentInfo = new Lang($APP->urlProject.$utlThisComponent, 'componentInfo', $APP->options['lang']);
+$langComponentInfo = new Localization($APP->urlProject.$utlThisComponent, 'componentInfo', $APP->options['lang']);
 
 $componentInfo = array(
     'name' => 'users_all_tables',

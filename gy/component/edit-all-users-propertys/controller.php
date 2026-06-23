@@ -1,12 +1,12 @@
 <?php 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
-use Gy\Core\User\GeneralUsersPropertys;
+use Gy\Core\User\UserPropertyStorage;
 
 $data = $_REQUEST;
 
 // получить все возможные типы свойств
-$arRes['allTypePropertys'] = GeneralUsersPropertys::getAllTypeAllUsersPropertys();
+$arRes['allTypePropertys'] = UserPropertyStorage::getAllTypeAllUsersPropertys();
 
 // сохранить новое свойство
 if (
@@ -16,7 +16,7 @@ if (
     && !empty($arRes['allTypePropertys'][$data['type_property']])
     && !empty($data['code'])
 ) {
-    $flag = GeneralUsersPropertys::addUsersPropertys(
+    $flag = UserPropertyStorage::addUsersPropertys(
         $data['name_property'],
         $data['type_property'],
         $data['code']
@@ -31,7 +31,7 @@ if (
 
 
 // получить все общие свойства пользователей которые были созданы
-$arRes['allUsersCreatePropertys'] = GeneralUsersPropertys::getAllGeneralUsersPropertys();
+$arRes['allUsersCreatePropertys'] = UserPropertyStorage::getAllGeneralUsersPropertys();
 
 // если удаление свойства
 if (
@@ -39,7 +39,7 @@ if (
     && !empty($data['del-id'])
     && !empty($arRes['allUsersCreatePropertys'][$data['del-id']])
 ) {
-    $flag = GeneralUsersPropertys::deleteUserProperty($data['del-id']);
+    $flag = UserPropertyStorage::deleteUserProperty($data['del-id']);
     if ($flag) {
         $arRes['stat'] = 'ok';
     } else {

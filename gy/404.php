@@ -1,11 +1,11 @@
 <?php include $_SERVER["DOCUMENT_ROOT"]."/gy/gy.php"; // подключить ядро // include core 
 
-use Gy\Core\Lang;
+use Gy\Core\Localization;
 
 global $APP;
 global $USER;
 
-$langTextThisFile = new Lang(
+$localization = new Localization(
     $APP->urlProject."/gy/lang", 
     '404', 
     $APP->options['lang']
@@ -14,7 +14,7 @@ $langTextThisFile = new Lang(
 http_response_code(404);
 ?>
 
-<div><?=$langTextThisFile->getMessage('error')?></div>
+<div><?=$localization->getMessage('error')?></div>
    
-<?
+<?php
 die();

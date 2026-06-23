@@ -4,8 +4,6 @@ namespace Gy\Core\User;
 
 use Gy\Core\User\AccessUserGroup;
 
-if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
-
 class User
 { 
 
@@ -94,7 +92,7 @@ class User
         $result = false;
 
         global $DB;
-        global $CRYPTO;
+        global $cryptoService;
 
         $res = $DB->selectDb(
             $this->tableName, 
@@ -102,7 +100,7 @@ class User
             array(
                 'AND' => array( 
                     array('=' => array('login', "'".$log."'" ) ),
-                    array( '=' => array('pass',"'".md5($pass.$CRYPTO->getSole())."'") )
+                    array( '=' => array('pass',"'".md5($pass.$cryptoService->getSole())."'") )
                 ),
             )
         );
@@ -110,7 +108,7 @@ class User
         if ($arRes = $DB->fetch($res)) {
 
             //$this->setUserCookie($arRes['id'] , $CRYPTO->getRandString());
-            $this->setUserCookie($arRes['id'] , $CRYPTO->getStringForUserCookie($arRes['login'], $arRes['name'], $arRes['id']));
+            $this->setUserCookie($arRes['id'] , $cryptoService->getStringForUserCookie($arRes['login'], $arRes['name'], $arRes['id']));
             $result = true;
         }
 

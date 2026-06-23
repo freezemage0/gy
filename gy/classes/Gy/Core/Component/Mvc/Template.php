@@ -2,7 +2,7 @@
 
 namespace Gy\Core\Component\Mvc;
 
-use Gy\Core\Lang;
+use Gy\Core\Localization;
 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
@@ -38,7 +38,7 @@ class Template
             $this->urlFileJs = $url.'/script.js';
         }
 
-        $this->lang = new Lang($url, 'template', $lang);
+        $this->lang = new Localization($url, 'template', $lang);
     }
 
     /* show - нарисовать/показать шаблон 

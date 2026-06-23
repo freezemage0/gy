@@ -1,13 +1,13 @@
 <?php
 
 global $argv;
-$isRunConsole = isset($argv);
+$isRunConsole = php_sapi_name() === 'cli';
 global $BR;
 $BR = "\n";
 
 //print_r($argv);
 
-function showHelpFromInstall(){
+function showHelpFromInstall(): void {
     global $BR;
     echo $BR."This script set options for gy framework".$BR;
     echo "===================================".$BR;

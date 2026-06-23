@@ -1,17 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Gy\Core;
-
-if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
 /**
  * Module - работа с модулями фреймворка
  */
-class Module
+class ModuleManager
 {
-
     // массив подключённых модулей
-    public $arrayIncludeModules = array();
+    private $arrayIncludeModules = array();
 
     // массив подключённых модулей и их версии
     public $arrayIncludeModulesAndVersion = array();
@@ -53,12 +51,9 @@ class Module
      * 
      * @return jbject this class
      */
-    static public function getInstance()
+    public static function getInstance(): ModuleManager
     {
-        if (self::$module === null) {
-            self::$module = new static();
-        }
-        return self::$module;
+        return self::$module ??= new static();
     }
 
     public function setUrlGyCore($urlGyCore)

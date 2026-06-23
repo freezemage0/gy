@@ -2,35 +2,37 @@
 
 namespace Gy\Core\User;
 
-if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
+if (!defined("GY_CORE") && (GY_CORE !== true)) {
+    die("gy: err include core");
+}
 
 /**
  * GeneralUsersPropertys - класс для работы с общими свойствами пользователей
  */
-class GeneralUsersPropertys
+class UserPropertyStorage
 {
 
     private static $tableNameCreatePropertys = 'create_all_users_property';
     private static $tableNameTypePropertys = 'type_all_user_propertys';
 
-    private static $tableNameTypePropertysForCodeTypeProperty = array(
-        'text' => 'value_all_user_propertys_text'
-    );
+    private static $tableNameTypePropertysForCodeTypeProperty = [
+        'text' => 'value_all_user_propertys_text',
+    ];
 
     /**
      * getAllGeneralUsersPropertys
      *  - получить все созданные пользовательские свойства
-     * 
-     * @global type $DB
+     *
      * @return array
+     * @global type $DB
      */
     public static function getAllGeneralUsersPropertys()
-    { 
+    {
         global $DB;
         $res = $DB->selectDb(
             self::$tableNameCreatePropertys,
-            array('*'),
-            array()
+            ['*'],
+            [],
         );
         $result = $DB->fetchAll($res, 'id');
         return $result;
@@ -39,32 +41,30 @@ class GeneralUsersPropertys
     /**
      * getAllTypeAllUsersPropertys
      *  - получить все возможные типы пользовательских свойств
-     * 
-     * @global type $DB
+     *
      * @return array
+     * @global type $DB
      */
     public static function getAllTypeAllUsersPropertys()
     {
         global $DB;
         $res = $DB->selectDb(
             self::$tableNameTypePropertys,
-            array('*'),
-            array(
-            )
+            ['*'],
+            [],
         );
-        $result = $DB->fetchAll($res, 'id');
-        return $result;
+        return $DB->fetchAll($res, 'id');
     }
 
     /**
      * addUsersPropertys
      *  - создать пользовательское свойство
-     * 
-     * @global type $DB
+     *
      * @param string $name - имя
      * @param int $idType - тип
      * @param string $code - код
      * @return boolean
+     * @global type $DB
      */
     public static function addUsersPropertys($name, $idType, $code)
     {
@@ -73,14 +73,14 @@ class GeneralUsersPropertys
         global $DB;
         $res = $DB->insertDb(
             self::$tableNameCreatePropertys,
-            array(
+            [
                 'name_property' => $name,
                 'type_property' => $idType,
-                'code' => $code
-            )
+                'code' => $code,
+            ],
         );
 
-        if ($res){
+        if ($res) {
             $result = true;
         }
         return $result;
@@ -89,10 +89,10 @@ class GeneralUsersPropertys
     /**
      * deleteUserProperty
      *  - удалить общее пользовательское свойство
-     * 
-     * @global type $DB
+     *
      * @param int $id - id общего пользовательского свойства
      * @return boolean
+     * @global type $DB
      */
     public static function deleteUserProperty($id)
     {
@@ -101,7 +101,7 @@ class GeneralUsersPropertys
 
         $res = $DB->deleteDb(
             self::$tableNameCreatePropertys,
-            array('='=>array('id', $id))
+            ['=' => ['id', $id]],
         );
 
         if ($res) {
@@ -117,11 +117,11 @@ class GeneralUsersPropertys
     /**
      * deleteAllValuesAllUserBypropertyId
      *  - удалить все значения определённого свойства у всех пользователей
-     * 
-     * @global type $DB
+     *
      * @param int $idProperty - id свойства (общее свойство)
      * @param string $typePropertyCode - пока у всех значение text
      * @return boolean
+     * @global type $DB
      */
     public static function deleteAllValuesAllUserBypropertyId($idProperty, $typePropertyCode)
     {
@@ -132,7 +132,7 @@ class GeneralUsersPropertys
 
             $res = $DB->deleteDb(
                 self::$tableNameTypePropertysForCodeTypeProperty[$typePropertyCode],
-                array( '=' => array('id_property', $idProperty) )
+                ['=' => ['id_property', $idProperty]],
             );
 
             if ($res) {
@@ -140,17 +140,16 @@ class GeneralUsersPropertys
             }
         }
         return $result;
-
     }
 
     /**
      * getAllValueUserProperty
      *  - взять все значения определённого типа свойства пользователя
-     * 
-     * @global type $DB
+     *
      * @param int $idUser - id пользователя
      * @param string $typePropertyCode - пока у всех значение text
      * @return boolean/array
+     * @global type $DB
      */
     public static function getAllValueUserProperty($idUser, $typePropertyCode)
     {
@@ -160,8 +159,8 @@ class GeneralUsersPropertys
             global $DB;
             $res = $DB->selectDb(
                 self::$tableNameTypePropertysForCodeTypeProperty[$typePropertyCode],
-                array('*'),
-                array( '=' => array('id_users', $idUser) )
+                ['*'],
+                ['=' => ['id_users', $idUser]],
             );
             $result = $DB->fetchAll($res, 'id_property');
         }
@@ -171,13 +170,13 @@ class GeneralUsersPropertys
     /**
      * addValueProperty
      *  - добавить значение свойства
-     * 
-     * @global type $DB
+     *
      * @param int $idUser - id пользователя
      * @param string $typePropertyCode - пока у всех значение text
      * @param int $idProperty - id пользовательского свойства
      * @param string $value - пока тип text, тут только строка
      * @return boolean
+     * @global type $DB
      */
     public static function addValueProperty($idUser, $typePropertyCode, $idProperty, $value)
     {
@@ -187,11 +186,11 @@ class GeneralUsersPropertys
             global $DB;
             $res = $DB->insertDb(
                 self::$tableNameTypePropertysForCodeTypeProperty[$typePropertyCode],
-                array(
+                [
                     'value' => $value,
                     'id_users' => $idUser,
-                    'id_property' => $idProperty
-                )
+                    'id_property' => $idProperty,
+                ],
             );
 
             if ($res) {
@@ -202,14 +201,14 @@ class GeneralUsersPropertys
     }
 
     /**
-     * deleteValueProperty 
+     * deleteValueProperty
      *  - удалить значения конкретного свойства конкретного пользователя
-     * 
-     * @global type $DB
+     *
      * @param int $idUser - id пользователя
      * @param string $typePropertyCode - пока у всех значение text
      * @param int $idProperty - id пользовательского свойства
      * @return boolean
+     * @global type $DB
      */
     public static function deleteValueProperty($idUser, $typePropertyCode, $idProperty)
     {
@@ -220,12 +219,12 @@ class GeneralUsersPropertys
 
             $res = $DB->deleteDb(
                 self::$tableNameTypePropertysForCodeTypeProperty[$typePropertyCode],
-                array( 
-                    'AND' => array(
-                        array('=' => array('id_users', $idUser) ),
-                        array('=' => array('id_property', $idProperty) )
-                    ),
-                )
+                [
+                    'AND' => [
+                        ['=' => ['id_users', $idUser]],
+                        ['=' => ['id_property', $idProperty]],
+                    ],
+                ],
             );
 
             if ($res) {
@@ -239,13 +238,13 @@ class GeneralUsersPropertys
     /**
      * updateValueProperty
      *  - изменить значение конкретного свойства конкретного пользователя
-     * 
-     * @global type $DB
+     *
      * @param int $idUser - id пользователя
      * @param string $typePropertyCode - пока у всех значение text
      * @param int $idProperty - id пользовательского свойства
      * @param string $value - пока тип text, тут только строка
      * @return boolean
+     * @global type $DB
      */
     public static function updateValueProperty($idUser, $typePropertyCode, $idProperty, $value)
     {
@@ -255,17 +254,17 @@ class GeneralUsersPropertys
             global $DB;
             $res = $DB->updateDb(
                 self::$tableNameTypePropertysForCodeTypeProperty[$typePropertyCode],
-                array(
+                [
                     'id_users' => $idUser,
                     'id_property' => $idProperty,
-                    'value' => $value
-                ),
-                array(
-                    'AND' => array(
-                        array('=' => array('id_users', $idUser) ),
-                        array('=' => array('id_property', $idProperty) )
-                    ),
-                )
+                    'value' => $value,
+                ],
+                [
+                    'AND' => [
+                        ['=' => ['id_users', $idUser]],
+                        ['=' => ['id_property', $idProperty]],
+                    ],
+                ],
             );
 
             if ($res) {

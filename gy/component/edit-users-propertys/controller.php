@@ -1,18 +1,18 @@
 <?php 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
-use Gy\Core\User\GeneralUsersPropertys;
+use Gy\Core\User\UserPropertyStorage;
 
 $data = $_REQUEST;
 
 // получить все возможные типы свойств
-$arRes['allTypePropertys'] = generalUsersPropertys::getAllTypeAllUsersPropertys();
+$arRes['allTypePropertys'] = UserPropertyStorage::getAllTypeAllUsersPropertys();
 
 // получить все общие свойства пользователей которые были созданы
-$arRes['allUsersCreatePropertys'] = generalUsersPropertys::getAllGeneralUsersPropertys();
+$arRes['allUsersCreatePropertys'] = UserPropertyStorage::getAllGeneralUsersPropertys();
 
 // получить значения свойств конкретного пользователя
-$arRes['valuePropertysThisUser'] = generalUsersPropertys::getAllValueUserProperty( $this->arParam['id-user'], 'text'); // text - т.к. пока только такие типы свойств реализованы
+$arRes['valuePropertysThisUser'] = UserPropertyStorage::getAllValueUserProperty( $this->arParam['id-user'], 'text'); // text - т.к. пока только такие типы свойств реализованы
 
 // собираю общий массив
 $arRes['propertys'] = array();
@@ -61,10 +61,10 @@ if (
     foreach ($data['property'] as $idProperty => $value) {
         if ($arRes['valuePropertysThisUser'][$idProperty]) { // было ли уже задано когда то такое значение, для такого своства
             // если да то обновляем то что есть уже
-            generalUsersPropertys::updateValueProperty($data['id-user'], 'text', $idProperty, $value);
+            UserPropertyStorage::updateValueProperty($data['id-user'], 'text', $idProperty, $value);
         } else {
             // если нет создаём новое значение
-            generalUsersPropertys::addValueProperty($data['id-user'], 'text', $idProperty, $value);
+            UserPropertyStorage::addValueProperty($data['id-user'], 'text', $idProperty, $value);
         }
     }
     $arRes['stat'] = 'ok';

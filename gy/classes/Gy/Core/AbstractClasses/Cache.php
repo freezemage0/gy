@@ -12,22 +12,23 @@ abstract class Cache
 
     /**
      * cacheInit - инициализация кеша
-     * @param string $cacheName
-     * @param int $cacheTime - время кеширования в секундах
+     * @param string $key
+     * @param int $expiresIn - время кеширования в секундах
      * @return boolean
      */
-    abstract public function cacheInit($cacheName, $cacheTime);
+    abstract public function cacheInit(string $key, int $expiresIn);
     
     /**
      * getCacheData() - получить данные из кеша
      * @return mixed - может быть массив или одиночное значение любого типа
      */
-    abstract public function getCacheData();
+    abstract public function getData();
     
     /**
      * setCacheData - записать данные в в кеш
      * @param mixed $data - может быть массив или одиночное значение
-     * @return boolean true
      */
-    abstract public function setCacheData($data);
+    abstract public function setData(mixed $data): void;
+
+    abstract public function clear(): void;
 }
