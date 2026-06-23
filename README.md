@@ -61,7 +61,7 @@ https://github.com/ssv32/gy/wiki</p>
     include $_SERVER["DOCUMENT_ROOT"]."/gy/gy.php"; // подключить ядро // include core
     
     // пример вызова компонента 
-    $app->component(
+    $APP->component(
         'form_auth',
         '0',
         array(
@@ -142,7 +142,7 @@ https://github.com/ssv32/gy/wiki </p>
     include $_SERVER["DOCUMENT_ROOT"]."/gy/gy.php"; // include core
     
     // example run component
-    $app->component(
+    $APP->component(
         'form_auth',
         '0',
         array( 
