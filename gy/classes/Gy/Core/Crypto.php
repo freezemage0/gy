@@ -4,12 +4,12 @@ namespace Gy\Core;
 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
-class Crypto
+final class Crypto
 {
     private string $salt;
 
     /**
-     * setSole - установить соль (некая строка)
+     * setSalt - установить соль (некая строка)
      * @param string $salt
      */
     public function setSalt(string $salt): void
@@ -18,7 +18,7 @@ class Crypto
     }
 
     /**
-     * getSole - получить значение соли
+     * getSalt - получить значение соли
      * @return string
      */
     public function getSalt(): string

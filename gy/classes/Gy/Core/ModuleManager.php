@@ -1,7 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Gy\Core;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Module - работа с модулями фреймворка
@@ -9,81 +12,70 @@ namespace Gy\Core;
 class ModuleManager
 {
     // массив подключённых модулей
-    private $arrayIncludeModules = array();
+    private array $arrayIncludeModules = [];
 
     // массив подключённых модулей и их версии
-    public $arrayIncludeModulesAndVersion = array();
+    public array $arrayIncludeModulesAndVersion = [];
 
     // соответствие компонентов подключенным модулям
-    public $nameModuleByComponentName = array();
+    public array $nameModuleByComponentName = [];
 
     // соответствие имени класса (находящегося в модуле) и имени модуля
-    public $nameClassModuleByNameModule = array();
+    public array $nameClassModuleByNameModule = [];
 
     // связь имени страницы и модуля
-    public $nameModuleByNameAdminPage = array();
+    public array $nameModuleByNameAdminPage = [];
 
     // пункты меню для админ панели (связанные с модулями)
-    public $buttonMenuAdminPanel = array();
+    public array $buttonMenuAdminPanel = [];
 
     // условия показа пунктов меню админки для подключённых модулей
-    public $isShowButtonsMenuAdminPanelModules = array();
+    public array $isShowButtonsMenuAdminPanelModules = [];
 
     // url до папки gy в проекте
-    private $urlGyCore = false;
-
-    // объект класса (всегда будет один)
-    private static $module;
-
-    private function  __construct()
-    {
-        // заполнить пустотой
-        $this->arrayIncludeModulesAndVersion = array();
-        $this->arrayIncludeModules = array();
-        $this->nameModuleByComponentName = array();
-        $this->nameClassModuleByNameModule = array();
-    }
+    private ?string $urlGyCore = null;
 
     /**
-     * getInstance 
+     * @deprecated Use ServiceLocator::getInstance()->getModuleManager() instead.
+     *
+     * getInstance
      *  - получение объекта класса (всегда один обьект)
      * реализация singleton
-     * 
+     *
      * @return jbject this class
      */
     public static function getInstance(): ModuleManager
     {
-        return self::$module ??= new static();
+        return Container::getInstance()->getModuleManager();
     }
 
-    public function setUrlGyCore($urlGyCore)
+    public function setUrlGyCore($urlGyCore): void
     {
         $this->urlGyCore = $urlGyCore;
     }
 
     /**
-     * IncludeModule 
+     * IncludeModule
      *  - подключить указанный модуль
      *  (т.е. ядро узнает о классах, компонентах модуля и прочем)
-     * 
-     * @param string $nameModule - имя модуля
-     * 
+     *
+     * @param string $name - имя модуля
+     *
      * @return bool - вернёт true если модуль найден и подключен или false если нет
      */
-    public function includeModule($nameModule)
+    public function includeModule(string $name): bool
     {
-        $result = false;
-        if ($this->urlGyCore !== false) {
-            $result = $this->IncludeModuleByUrl($this->urlGyCore.'/modules/'.$nameModule.'/');
-        } // TODO возможно кудато вывести ошибку
-        
-        return $result;
+        if ($this->urlGyCore === null) {
+            return false;
+        }
+
+        return $this->includeModuleByUrl($this->urlGyCore . '/modules/' . $name . '/');
     }
 
     /**
      * includeModuleByUrl
-     *  - подключить модуль по указанному урлу 
-     * 
+     *  - подключить модуль по указанному урлу
+     *
      * @param string $urlModule
      * @return boolean
      */
@@ -91,69 +83,68 @@ class ModuleManager
     { // TODO можно добавить проверки на ошибки 
         $result = false;
 
-        if (file_exists($urlModule.'init.php' )) {
-            include $urlModule.'init.php';
+        if (!\is_file($urlModule . 'init.php')) {
+            return false;
+        }
 
-            // тут имя модуля
-            if (!empty($nameThisModule)) {
-                $this->arrayIncludeModules[$nameThisModule] = $urlModule;
-                //unset($nameThisModule);
+        include $urlModule . 'init.php';
 
-                if (!empty($versionThisModule)) {
-                    $this->arrayIncludeModulesAndVersion[$nameThisModule] = $versionThisModule;
-                    unset($versionThisModule);
-                }
+        // тут имя модуля
+        if (!empty($nameThisModule)) {
+            $this->arrayIncludeModules[$nameThisModule] = $urlModule;
+            //unset($nameThisModule);
 
-            }
-
-            // тут список компонентов модуля
-            if (!empty($componentsThisModule)) {
-
-                foreach ($componentsThisModule as $value) {
-                    $this->nameModuleByComponentName[$value] = $nameThisModule;
-                }
-
-                unset($componentsThisModule);
-            }
-
-            // тут список классов модуля
-            if (!empty($classesThisModule)) {
-
-                foreach ($classesThisModule as $value) {
-                    $this->nameClassModuleByNameModule[$value] = $nameThisModule;
-                }
-                unset($classesThisModule);
-            }
-
-            // тут список страниц админки
-            if (!empty($adminPageThisModule)) {
-
-                foreach ($adminPageThisModule as $value) {
-                    $this->nameModuleByNameAdminPage[$value] = $nameThisModule;
-                }
-                unset($adminPageThisModule);
-            }
-
-            // пункты меню в админке
-            if (!empty($pagesFromAdminMenu)) {
-                $this->buttonMenuAdminPanel[$nameThisModule] = $pagesFromAdminMenu;
-                unset($pagesFromAdminMenu);
-            }
-
-            // условия показа пунктов меню админки для подключённых модулей
-            if (!empty($isShowButtonsMenuAdminPanetThisModule)) {
-                $this->isShowButtonsMenuAdminPanelModules[$nameThisModule] = $isShowButtonsMenuAdminPanetThisModule;
-                unset($isShowButtonsMenuAdminPanetThisModule);
+            if (!empty($versionThisModule)) {
+                $this->arrayIncludeModulesAndVersion[$nameThisModule] = $versionThisModule;
+                unset($versionThisModule);
             }
         }
-        return $result;
+
+        // тут список компонентов модуля
+        if (!empty($componentsThisModule)) {
+            foreach ($componentsThisModule as $value) {
+                $this->nameModuleByComponentName[$value] = $nameThisModule;
+            }
+
+            unset($componentsThisModule);
+        }
+
+        // тут список классов модуля
+        if (!empty($classesThisModule)) {
+            foreach ($classesThisModule as $value) {
+                $this->nameClassModuleByNameModule[$value] = $nameThisModule;
+            }
+            unset($classesThisModule);
+        }
+
+        // тут список страниц админки
+        if (!empty($adminPageThisModule)) {
+            foreach ($adminPageThisModule as $value) {
+                $this->nameModuleByNameAdminPage[$value] = $nameThisModule;
+            }
+            unset($adminPageThisModule);
+        }
+
+        // пункты меню в админке
+        if (!empty($pagesFromAdminMenu)) {
+            $this->buttonMenuAdminPanel[$nameThisModule] = $pagesFromAdminMenu;
+            unset($pagesFromAdminMenu);
+        }
+
+        // условия показа пунктов меню админки для подключённых модулей
+        if (!empty($isShowButtonsMenuAdminPanetThisModule)) {
+            $this->isShowButtonsMenuAdminPanelModules[$nameThisModule] = $isShowButtonsMenuAdminPanetThisModule;
+            unset($isShowButtonsMenuAdminPanetThisModule);
+        }
+
+        return true;
     }
 
 
     /**
      * getModulesComponent
      *  - получить по имени компонента данные о компоненте из подключённых модулей
-     * 
+     *
      * @param string $nameComponent
      * @return string
      */
@@ -162,16 +153,16 @@ class ModuleManager
         $result = false;
 
         if (!empty($this->nameModuleByComponentName[$nameComponent])) {
-            $result = $this->arrayIncludeModules[ $this->nameModuleByComponentName[$nameComponent] ].'component/'.$nameComponent;
+            $result = $this->arrayIncludeModules[$this->nameModuleByComponentName[$nameComponent]] . 'component/' . $nameComponent;
         }
 
         return $result;
-    } 
+    }
 
     /**
      * getUrlModuleClassByNameClass
      *  - по имени класса, если он есть в одном из подключённых модулей выдать урл на класс
-     * 
+     *
      * @param string $nameClass
      * @return string
      */
@@ -179,7 +170,7 @@ class ModuleManager
     {
         $result = false;
         if (!empty($this->nameClassModuleByNameModule[$nameClass])) {
-            $result = $this->arrayIncludeModules[ $this->nameClassModuleByNameModule[$nameClass] ].'classes/'.$nameClass.'.php';
+            $result = $this->arrayIncludeModules[$this->nameClassModuleByNameModule[$nameClass]] . 'classes/' . $nameClass . '.php';
         }
         return $result;
     }
@@ -187,13 +178,13 @@ class ModuleManager
     /**
      * searchAllModules()
      *  - найти все разделы из раздела /gy/modules , т.е. все имеющиеся модули
-     * 
+     *
      * @return array
      */
     public function searchAllModules()
     {
-        $result = array();
-        if ($handleDirs = opendir( $this->urlGyCore.'/modules/' )) {
+        $result = [];
+        if ($handleDirs = opendir($this->urlGyCore . '/modules/')) {
             while (false !== ($dirName = readdir($handleDirs))) {
                 if (($dirName != '.') && ($dirName != '..')) {
                     $result[$dirName] = $dirName;
@@ -207,31 +198,28 @@ class ModuleManager
     /**
      * includeAllModules()
      *  - подключить все имеющиеся модули
-     * 
+     *
      */
-    public function includeAllModules()
+    public function includeAllModules(): void
     {
-        $allModules = $this->searchAllModules();
-        if (!empty($allModules)) {
-            foreach ($allModules as $value) {
-                $this->includeModule($value);
-            }
+        foreach ($this->searchAllModules() as $value) {
+            $this->includeModule($value);
         }
     }
 
     /**
-     * installDbModuleByNameModule 
+     * installDbModuleByNameModule
      *  - установить часть БД связанную с этим модулем
-     * 
+     *
      * @param string $nameModule - имя модуля
      * @return boolean
      */
     public function installDbModuleByNameModule($nameModule)
     { // TODO пока только установка для mysql
         $result = false;
-        
-        if (file_exists($this->urlGyCore.'/modules/'.$nameModule.'/install/installDataBaseTable.php' )) {
-            include_once( $this->urlGyCore.'/modules/'.$nameModule.'/install/installDataBaseTable.php' );
+
+        if (file_exists($this->urlGyCore . '/modules/' . $nameModule . '/install/installDataBaseTable.php')) {
+            include_once($this->urlGyCore . '/modules/' . $nameModule . '/install/installDataBaseTable.php');
             $result = true;
         }
 
@@ -239,7 +227,7 @@ class ModuleManager
     }
 
     /**
-     * installBdAllModules 
+     * installBdAllModules
      *  - установить части БД для всех модулей
      */
     public function installBdAllModules()
@@ -255,7 +243,7 @@ class ModuleManager
     /**
      * getButtonsMenuByModule
      *  - вернуть кнопки меню панели администратора определённые в указанном модуле
-     * 
+     *
      * @param string $nameModule - код модуля
      * @return array - массив с кнопками где ключ это название пункта меню а значение url
      */
@@ -267,7 +255,7 @@ class ModuleManager
     /**
      * getButtonsMenuAllModules
      *  - вернуть все пункты меню админки всех подключённых модулей
-     * 
+     *
      * @return array - массив с кнопками где ключ это код модуля,
      *   а значения как результат getButtonsMenuByModule
      */
@@ -281,10 +269,10 @@ class ModuleManager
      *  - вернуть условие показа кнопок в админке,
      *  это код для метода Gy\Core\User\AccessUserGroup::accessThisUserByAction
      *  т.е. действие и если оно разрешено пользователю то покажется пункты меню в админке
-     *  
-     * 
+     *
+     *
      * @param string $nameModule - код модуля
-     * @return string - код действия 
+     * @return string - код действия
      */
     public function getFlagShowButtonsAdminPanelByModule($nameModule)
     {
@@ -296,4 +284,64 @@ class ModuleManager
         return $this->arrayIncludeModulesAndVersion;
     }
 
+    public function autoloadModuleClass(string $fqn): void
+    {
+        $config = Container::getInstance()->getConfiguration();
+        //   1. для модулей завести пространство имён типа Gy\Modules\<имя модуля>\Classes\<имя класса>
+        //   2. потом подключать вначале customDir/vendor
+        //   3. уже потом из раздела gy/classes
+
+        // из пространства имён составляю путь к классу
+        $className = \ltrim($fqn, '\\');
+
+        $fileName = '';
+        $namespace = '';
+        if ($lastNsPos = strrpos($className, '\\')) {
+            $namespace = substr($className, 0, $lastNsPos);
+            $className = substr($className, $lastNsPos + 1);
+            $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+        }
+
+        $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+
+        // определяю является ли путь и вызываемый класс, классом модуля,
+        //   если так то подключаю класс модуля
+        //   пространство имён будет: Gy\Modules\<имя модуля>\Classes\<имя класса>
+
+        // условие регулярки для такого пространства имён
+        $separator = \preg_quote(DIRECTORY_SEPARATOR);
+        $pattern = "#^(Gy{$separator}Modules{$separator})(.*)({$separator}Classes{$separator})(.*).php#";
+
+        $matches = []; // тут результат парсинга
+
+        if (\preg_match($pattern, $fileName, $matches) !== 0) {
+            //$parseUrl[2] - тут имя модуля
+            //$parseUrl[4] - Тут имя класса
+
+            // TODO можно было бы подключить конкретный модуль но пока оставлю старую механику
+            //   (когда подключаются все сразу)
+
+            // проверю есть ли класс в подключённых модулях и подключу (в модулях psr0 нет)
+            $meyByClassModule = $this->getUrlModuleClassByNameClass($matches[4]);
+            if ($meyByClassModule !== false) {
+                require_once($meyByClassModule);
+            }
+
+            return;
+        }
+
+        $customClass = $config->projectRoot . DIRECTORY_SEPARATOR . 'customDir' . DIRECTORY_SEPARATOR . 'classes/' . DIRECTORY_SEPARATOR . $fileName;
+        if (\is_file($customClass)) {
+            // иначе, если не класс модуля, ищу класс в разделе для кастомных (пользовательских) классов
+            require_once $customClass;
+
+            return;
+        }
+
+        $gyClass = $config->projectRoot . DIRECTORY_SEPARATOR . 'gy/classes' . DIRECTORY_SEPARATOR . $fileName;
+        if (\is_file($gyClass)) {
+            // иначе ищу класс в классах gy
+            require_once $gyClass;
+        }
+    }
 }

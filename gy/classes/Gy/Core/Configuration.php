@@ -9,18 +9,20 @@ declare(strict_types=1);
 namespace Gy\Core;
 
 use RuntimeException;
+use SensitiveParameter;
 
 final class Configuration
 {
     public function __construct(
-        public readonly string $language,
-        public readonly string $salt,
-        public readonly array $databaseConfig,
-        public readonly string $page404,
-        public readonly string $cacheType,
+        public string $language,
+        public string $salt,
+        public array $databaseConfig,
+        public string $page404,
+        public string $cacheType,
         public string $version,
-        public readonly string $publicDirectory,
-        public readonly string $projectRoot,
+        public string $publicDirectory,
+        public string $projectRoot,
+        #[SensitiveParameter] public ?string $appSecret
     ) {}
 
     public static function createFromFile(string $file): Configuration
@@ -40,6 +42,7 @@ final class Configuration
             version: $config['v-gy'],
             publicDirectory: $config['dir_public_file'],
             projectRoot: \dirname($file),
+            appSecret: $config['secretKeyAuthorizationAdminPanel'] ?? null
         );
     }
 }

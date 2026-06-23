@@ -1,6 +1,6 @@
 <?php
 
-use Gy\Core\ServiceLocator;
+use Gy\Core\Container;
 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
@@ -14,7 +14,7 @@ if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 // языковой файл
 global $LANG;
 
-$config = ServiceLocator::getInstance()->getConfiguration();
+$config = Container::getInstance()->getConfiguration();
 include 'lang_init.php';
 
 // компоненты которые есть в модуле

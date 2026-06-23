@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Gy\Core\App;
+use Gy\Core\Application;
 use Gy\Core\Configuration;
-use Gy\Core\Db\MySql;
+use Gy\Core\Container;
 use Gy\Core\Db\PgSql;
 use Gy\Core\Db\PhpFileSqlClientForGy;
-use Gy\Core\ModuleManager;
 use Gy\Core\Security;
-use Gy\Core\ServiceLocator;
+use Gy\Core\Storage\Mysql\MySql;
+use Gy\Core\User\AccessUserGroup;
 use Gy\Core\User\User;
 
 // если ядро не подключено подключаем всё а если уже подключено то не надо
@@ -20,86 +20,19 @@ if (!defined('GY_CORE')) {
     // подключение настроек ядра // include options
     $config = Configuration::createFromFile(__DIR__ . 'config/gy_config.php');
 
+    // добавлю версию ядра gy
+    $config->version = '0.4-alpha';
+
+    $application = new Application($config);
+
     if (in_array($config['lang'], ['rus', 'eng'])) {
         global $LANG;
         $LANG = $config->language;
     }
-
-    // путь к проекту
-    global $URL_PROJECT;
-    $URL_PROJECT = substr(__DIR__, 0, (strlen(__DIR__) - 3));
-
-    // авто подключение классов // кроме подключения классов модулей используется psr0
-    function autoload($className)
-    {
-        //   1. для модулей завести пространство имён типа Gy\Modules\<имя модуля>\Classes\<имя класса>
-        //   2. потом подключать вначале customDir/vendor
-        //   3. уже потом из раздела gy/classes
-
-        global $URL_PROJECT;
-
-        // из пространства имён составляю путь к классу
-        $className = ltrim($className, '\\');
-        $fileName = '';
-        $namespace = '';
-        if ($lastNsPos = strrpos($className, '\\')) {
-            $namespace = substr($className, 0, $lastNsPos);
-            $className = substr($className, $lastNsPos + 1);
-            $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
-        }
-        $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-
-        // определяю является ли путь и вызываемый класс, классом модуля,
-        //   если так то подключаю класс модуля 
-        //   пространство имён будет: Gy\Modules\<имя модуля>\Classes\<имя класса>
-
-        // условие регулярки для такого пространства имён 
-        $br = preg_quote(DIRECTORY_SEPARATOR);
-        $pattern = "#^(Gy" . $br . "Modules" . $br . ")(.*)(" . $br . "Classes" . $br . ")(.*).php#";
-
-        //var_dump(  "#^Gy".DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR."Modules".DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR."#" );
-        $parseUrl = []; // тут результат парсинга
-
-        if (preg_match($pattern, $fileName, $parseUrl) == 1) {
-            //$parseUrl[2] - тут имя модуля
-            //$parseUrl[4] - Тут имя класса
-
-            // TODO можно было бы подключить конкретный модуль но пока оставлю старую механику 
-            //   (когда подключаются все сразу)
-
-            // проверю есть ли класс в подключённых модулях и подключу (в модулях psr0 нет)
-            $moduleManager = ModuleManager::getInstance();
-            $meyByClassModule = $moduleManager->getUrlModuleClassByNameClass($parseUrl[4]);
-            if ($meyByClassModule !== false) {
-                require_once($meyByClassModule);
-            } else {
-                //die('!Error class '.$className.' not found'); 
-            }
-        } elseif (file_exists(
-            $URL_PROJECT . DIRECTORY_SEPARATOR . 'customDir' . DIRECTORY_SEPARATOR . 'classes/' . DIRECTORY_SEPARATOR . $fileName,
-        )) {
-            // иначе, если не класс модуля, ищу класс в разделе для кастомных (пользовательских) классов
-            require_once $URL_PROJECT . DIRECTORY_SEPARATOR . 'customDir' . DIRECTORY_SEPARATOR . 'classes/' . DIRECTORY_SEPARATOR . $fileName;
-        } elseif (file_exists($URL_PROJECT . DIRECTORY_SEPARATOR . 'gy/classes' . DIRECTORY_SEPARATOR . $fileName)) {
-            // иначе ищу класс в классах gy
-            require_once 'classes' . DIRECTORY_SEPARATOR . $fileName;
-        }
-    }
-
-    spl_autoload_register('autoload');
-
-    // подключить модули (пока сразу все)
-    $module = ModuleManager::getInstance();
-    $module->setUrlGyCore(__DIR__);
-    //$module->includeModule('containerdata'); - так подключается конкретный модуль
-    $module->includeAllModules();
-
     // обезопасить получаемый конфиг
 
     global $APP;
-    // добавлю версию ядра gy
-    $config->version = '0.4-alpha';
-    $APP = new App($config->projectRoot, $config);
+    $APP = $application;
 
     // подключить класс работы с базой данный // include class work database
     if (
@@ -119,13 +52,20 @@ if (!defined('GY_CORE')) {
     } else {
         throw new RuntimeException('Database connection must be present');
     }
+    $container = new Container($APP, $db, $config);
 
-    $serviceLocator = new ServiceLocator($APP, $db, $config);
+    // подключить модули (пока сразу все)
+    $moduleManager = $container->getModuleManager();
+    $moduleManager->setUrlGyCore(__DIR__);
+    $moduleManager->includeAllModules();
+
+    // авто подключение классов // кроме подключения классов модулей используется psr0
+    spl_autoload_register($moduleManager->autoloadModuleClass(...));
 
     global $cryptoService;
-    $cryptoService = ServiceLocator::getInstance()->getCryptoService();
+    $cryptoService = Container::getInstance()->getCryptoService();
     if ($config->salt !== '') {
-        $cryptoService->setSalt($APP->configuration['sole']);
+        $cryptoService->setSalt($config->salt);
     }
 
     global $USER;
@@ -133,7 +73,7 @@ if (!defined('GY_CORE')) {
 
     // объявить имя класса для кеша // TODO пока так но сделать надо получше (заменить на фабрику или ещё какой патерн)
     if (!isset($APP->configuration['type_cache'])) {
-        $APP->configuration['type_cache'] = 'cacheFiles';
+        $config->cacheType = 'cacheFiles';
     }
     global $CACHE_CLASS_NAME;
     $CACHE_CLASS_NAME = 'Gy\\Core\\Cache\\' . $APP->configuration->cacheType;
@@ -162,19 +102,18 @@ if (!defined('GY_CORE')) {
     }
 
     // если задан secretKeyAuthorizationAdminPanel для админки, то без этого ключа (secretKeyAdminPanel в урле) не пускать в админку
-    if (!empty($APP->configuration['secretKeyAuthorizationAdminPanel'])) {
+    if ($config->appSecret !== null) {
         $isAdminPageGy = strripos($_SERVER['REQUEST_URI'], '/gy/') !== false;
-        $isTrueSecretKeyAuthorizationAdminPanel = (!empty($_REQUEST['secretKeyAdminPanel']) && ($_REQUEST['secretKeyAdminPanel'] == $APP->configuration['secretKeyAuthorizationAdminPanel']));
+        $validSecretKey = ($_REQUEST['secretKeyAdminPanel'] ?? null) === $config->appSecret;
 
         if (
             $isAdminPageGy
-            && (!$isTrueSecretKeyAuthorizationAdminPanel && !Gy\Core\User\AccessUserGroup::accessThisUserByAction(
-                    'show_admin_panel',
-                )
-            )
+            && !$validSecretKey
+            && !AccessUserGroup::accessThisUserByAction('show_admin_panel')
         ) {
-            if (!empty($URL_PROJECT . DIRECTORY_SEPARATOR . $APP->configuration['urlPage404'])) {
-                include($URL_PROJECT . DIRECTORY_SEPARATOR . $APP->configuration['urlPage404']);
+            $page404 = $config->projectRoot . DIRECTORY_SEPARATOR . $APP->configuration['urlPage404'];
+            if (!empty($page404)) {
+                include($page404);
             } else {
                 include('404.php');
             }

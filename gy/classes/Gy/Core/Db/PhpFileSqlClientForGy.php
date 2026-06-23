@@ -2,7 +2,7 @@
 
 namespace Gy\Core\Db;
 
-use Gy\Core\AbstractClasses\Db;
+use Gy\Core\Storage\Driver;
 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
@@ -10,7 +10,7 @@ if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
  *   https://github.com/ssv32/PhpFileSql
  * class work PhpFileSql 
  */
-class PhpFileSqlClientForGy extends Db
+class PhpFileSqlClientForGy extends Driver
 {
 
     public $test = 'PhpFileSqlClient ok';
@@ -131,22 +131,22 @@ class PhpFileSqlClientForGy extends Db
      * selectDb - запрос типа select. на получение данных
      * @param $db - расурс, коннект к базе данных
      * @param string $tableName - имя таблицы 
-     * @param array $propertys - параметры (какие поля вернуть или * - все)
+     * @param array $columns - параметры (какие поля вернуть или * - все)
      * @param array $where - условия запроса, массив специальной структуры в виде дерева (может не быть)
      * @return - false or object result query
      */
-    public function selectDb($tableName, $propertys = '*', $where = false)
+    public function selectDb($tableName, $columns = '*', $where = false)
     {
 
         // чуть подправить для совместимости
-        if ($propertys[0] == '*') {
-            $propertys = '*';
+        if ($columns[0] == '*') {
+            $columns = '*';
         }
 
         // подготовить массив с условиями для класса PhpFileSql
         $where = $this->createTrueArrayWhereFromPhpFileSql($where);
 
-        $dataResult = $this->db->select($tableName, $propertys, $where);
+        $dataResult = $this->db->select($tableName, $columns, $where);
 
         // записываю для метода fetch()
         $this->dataSelectForFetch = $dataResult;

@@ -6,7 +6,7 @@ namespace Gy\Core;
 
 use Gy\Core\Component\Component;
 
-final class App
+final class Application
 {
     public string $coreDirectory;
     // настройки проекта

@@ -2,7 +2,7 @@
 
 namespace Gy\Core\Db;
 
-use Gy\Core\AbstractClasses\Db;
+use Gy\Core\Storage\Driver;
 
 if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
 
@@ -10,7 +10,7 @@ if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
  * PgSql - класс для работы с базой данных PostgreSQL
  * class work PostgreSQL
  */
-class PgSql extends Db
+class PgSql extends Driver
 {
 
     public $test = 'pgsql ok';
@@ -269,17 +269,17 @@ class PgSql extends Db
      * selectDb - запрос типа select. на получение данных
      * @param $db - расурс, коннект к базе данных
      * @param string $tableName - имя таблицы 
-     * @param array $propertys - параметры (какие поля вернуть или * - все)
+     * @param array $columns - параметры (какие поля вернуть или * - все)
      * @param array $where - условия запроса, массив специальной структуры в виде дерева (может не быть)
      * @return - false or object result query
      */
-    public function selectDb($tableName, $propertys, $where = array())
+    public function selectDb($tableName, $columns, $where = array())
     {
         $query = 'SELECT ';
 
         //$propertys = $this->allValueArrayInMbStrtolower($propertys);
 
-        $strPropertys = implode(",", $propertys);
+        $strPropertys = implode(",", $columns);
 
         if (!empty($where)) {
             $where = ' WHERE '.$this->parseWhereForQuery($where);

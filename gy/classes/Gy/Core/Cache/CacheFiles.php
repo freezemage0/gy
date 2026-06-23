@@ -1,19 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gy\Core\Cache;
 
-use Gy\Core\AbstractClasses\Cache;
+use Gy\Core\Contract\Cache\CacheInterface;
 use RuntimeException;
-
-if (!defined("GY_CORE") && (GY_CORE !== true)) {
-    die("gy: err include core");
-}
 
 /**
  * cache - класс для работы с кешем
  * для даботы нужен раздел gy/cache/
  */
-class CacheFiles extends Cache
+final class CacheFiles implements CacheInterface
 {
     private string $cacheUrl = '/cache/';
     private array $data = [];
@@ -55,7 +53,7 @@ class CacheFiles extends Cache
      * @param int $expiresIn - время кеширования в секундах
      * @return boolean
      */
-    public function cacheInit(string $key, int $expiresIn): bool
+    public function initialize(string $key, int $expiresIn): bool
     {
         $this->createCacheDirectory();
 
@@ -104,9 +102,10 @@ class CacheFiles extends Cache
             'cacheTime' => $this->expiresIn,
         ];
 
+        $serializedCacheInfo = \json_encode($cacheData);
         \file_put_contents(
             $this->projectUrl . $this->cacheUrl . $this->key . $this->endUrl,
-            '<?php return ' . "'" . \json_encode($cacheData) . "';",
+            "<?php return '{$serializedCacheInfo}';",
         );
     }
 

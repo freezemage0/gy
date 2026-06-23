@@ -8,12 +8,12 @@ declare(strict_types=1);
 
 namespace Gy\Core;
 
-use Gy\Core\AbstractClasses\Db;
+use Gy\Core\Storage\Driver;
 use RuntimeException;
 
-final class ServiceLocator
+final class Container
 {
-    private static ServiceLocator $instance;
+    private static Container $instance;
 
     private ?Crypto $crypto = null;
 
@@ -23,14 +23,14 @@ final class ServiceLocator
     }
 
     public function __construct(
-        private readonly App $application,
-        private readonly Db $databaseConnection,
+        private readonly Application $application,
+        private readonly Driver $databaseConnection,
         private readonly Configuration $configuration,
     ) {
         self::$instance = $this;
     }
 
-    public function getApplication(): App
+    public function getApplication(): Application
     {
         return $this->application;
     }
@@ -40,7 +40,7 @@ final class ServiceLocator
         return $this->crypto ??= new Crypto();
     }
 
-    public function getDatabaseConnection(): Db
+    public function getDatabaseConnection(): Driver
     {
         return $this->databaseConnection;
     }
@@ -48,5 +48,10 @@ final class ServiceLocator
     public function getConfiguration(): Configuration
     {
         return $this->configuration;
+    }
+
+    public function getModuleManager(): ModuleManager
+    {
+        return $this->moduleManager ??= new ModuleManager();
     }
 }

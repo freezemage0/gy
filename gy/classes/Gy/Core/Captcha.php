@@ -1,21 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gy\Core;
 
-if (!defined("GY_CORE") && (GY_CORE !== true)) {
-    die("gy: err include core");
-}
-
 /**
- * class Capcha - для работы с капчей
+ * class Captcha - для работы с капчей
  */
-class Captcha
+final class Captcha
 {
 
     // символы которые будут в капче
     //private static $letters = 'abcdefghijklmnopqrstuvwxyzABCDRFGHIJKLMNOPQRSTUVWXYZ0123456789';
     //  убрал ноль и буквы о, что бы не было путаниц
-    private static $letters = 'aAbBcCdDeEfFgG1hHiI2jJkK3lLm4MnN5p6PqQr7RsSt8TuUv9VwWxXyYzZ';
+    private const string CHARACTERS = 'aAbBcCdDeEfFgG1hHiI2jJkK3lLm4MnN5p6PqQr7RsSt8TuUv9VwWxXyYzZ';
 
     private $count = 5; // количество символов
     private $code = 5; // код капчи
@@ -170,7 +168,7 @@ class Captcha
 
             $x = rand(3, 10);
 
-            if ($this->fontPath == false) {
+            if ($this->fontPath === null) {
                 // если не задан шрифт то будет штатным рисоваться но без поворота букв
                 imagestring($img, $font, $x + ($i * 20), 10 + $y, $code[$i], $textColor);
                 imagestring($img, $font, $x + 1 + ($i * 20), 11 + $y, $code[$i], $textColor);
@@ -207,8 +205,8 @@ class Captcha
      */
     private function getRandLetter()
     {
-        $randLetter = \rand(0, \strlen(self::$letters) - 1);
+        $randLetter = \rand(0, \strlen(self::CHARACTERS) - 1);
 
-        return \substr(self::$letters, $randLetter, 1);
+        return \substr(self::CHARACTERS, $randLetter, 1);
     }
 }

@@ -33,13 +33,13 @@ class Component
         $module = ModuleManager::getInstance();
         $urlComponentInModule = $module->getModulesComponent($name);
 
-        if (($err == 0) && file_exists($url.'/customDir/component/'.$name.'/teplates/'.$template.'/template.php' )) {
+        if (\is_file($url.'/customDir/component/'.$name.'/teplates/'.$template.'/template.php' )) {
             // если есть такой компонент и указанный шаблон в папке /customDir/ то подключить от туда
             $template = new Template($url.'/customDir/component/'.$name.'/teplates/'.$template, $lang ); 
         } elseif (($urlComponentInModule !== false) && file_exists($urlComponentInModule.'/teplates/'.$template.'/template.php' )) {
             // проверить нет ли компонента среди подключенных модулей
             $template = new Template($urlComponentInModule.'/teplates/'.$template, $lang ); 
-        } elseif (($err == 0) && file_exists($url.'/gy/component/'.$name.'/teplates/'.$template.'/template.php' )) { 
+        } elseif (\is_file($url.'/gy/component/'.$name.'/teplates/'.$template.'/template.php' )) {
             // если нет то поискать шаблон в стандартной папке с компонентами
             $template = new Template($url.'/gy/component/'.$name.'/teplates/'.$template, $lang );
         } else {
@@ -55,7 +55,7 @@ class Component
             $this->controller = new Controller($url.'/gy/component/'.$name, $lang); // всегда один
         } else {
             $err = 2;
-            $errText = $this->lang->getMessage('err_not_controller') ;
+            $errText = $this->lang->getMessage('err_not_controller');
         }
 
         if (($err == 0) && file_exists($url.'/customDir/component/'.$name.'/model.php' )) {
@@ -93,13 +93,8 @@ class Component
         //$this->template->show($arRes);
     }
 
-    /**
-     * ShowErr 
-     * @param type $err
-     */
-    public function ShowErr($err)
+    public function ShowErr(string $message): void
     { // TODO вынести в отдельный класс про ошибки
-        echo '<div class=gy_err>'.$err.'</div>';
+        echo '<div class=gy_err>'.$message.'</div>';
     }
-
 }

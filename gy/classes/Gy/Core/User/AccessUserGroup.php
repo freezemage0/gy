@@ -100,13 +100,11 @@ class AccessUserGroup
 
         // определить пользователю с таким набором групп доступно ли указанное 
         //     действие
-        $arResult = self::checkAccessUserGroupsByUserAction(
-            $groupsThisUser, 
-            $dataAllGroups, 
+        return self::checkAccessUserGroupsByUserAction(
+            $groupsThisUser,
+            $dataAllGroups,
             $action
         );
-
-        return $arResult;
     }
 
     /**
