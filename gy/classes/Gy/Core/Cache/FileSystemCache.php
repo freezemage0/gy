@@ -8,10 +8,9 @@ use Gy\Core\Contract\Cache\CacheInterface;
 use RuntimeException;
 
 /**
- * cache - класс для работы с кешем
- * для даботы нужен раздел gy/cache/
+ * Предоставляет API кэширования в файловой системе.
  */
-final class CacheFiles implements CacheInterface
+final class FileSystemCache implements CacheInterface
 {
     private string $cacheUrl = '/cache/';
     private array $data = [];
@@ -20,8 +19,7 @@ final class CacheFiles implements CacheInterface
     private string $endUrl = '.php';
 
     /**
-     *
-     * @param type $projectUrl - путь к проекту
+     * @param string $projectUrl - путь к проекту
      */
     public function __construct(
         private readonly string $projectUrl = '/',

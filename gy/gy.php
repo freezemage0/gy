@@ -45,7 +45,7 @@ if (!defined('GY_CORE')) {
         global $DB;
 
         $db = match ($config->databaseConfig['db_type']) {
-            'MySql' => new MySql($config->databaseConfig),
+            'MySql' => new MySql($config),
             'PgSql' => new PgSql($config->databaseConfig),
             'PhpFileSqlClientForGy' => new PhpFileSqlClientForGy($config->databaseConfig),
         };

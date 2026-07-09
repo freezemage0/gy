@@ -87,7 +87,7 @@ class Component
     /**
      * run() 
      */
-    public function run()
+    public function run(): void
     {
         $this->controller->run();
         //$this->template->show($arRes);

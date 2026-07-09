@@ -10,7 +10,7 @@ class Url
 {
     /**
      * getThisUrlNotGetProperty 
-     *  - получить тукущий url без параметров get
+     *  - получить текущий url без параметров get
      * 
      * @return null/string 
      */

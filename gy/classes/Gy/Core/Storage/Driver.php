@@ -3,6 +3,7 @@
 namespace Gy\Core\Storage;
 
 use Gy\Core\Contract\Storage\DriverInterface;
+use Gy\Core\Contract\Storage\ResultInterface;
 
 if (!defined("GY_CORE") && (GY_CORE !== true)) {
     die("gy: err include core");
@@ -28,7 +29,7 @@ abstract class Driver implements DriverInterface
      * @param $db - resource (create self::connect()), $query - string query
      * @return false or object result query
      */
-    abstract public function query($query); // запрос к db
+    abstract public function query(string $query): ?ResultInterface; // запрос к db
 
     /**  close() - close connect database
      * @param $db - resource (create self::connect())
@@ -90,11 +91,11 @@ abstract class Driver implements DriverInterface
     /**
      * createTable - создать таблицу в базе данных
      * @param string $tableName - имя таблици
-     * @param array $propertys - параметры
+     * @param array $columnDefinitions - параметры
      *     (приер  login varchar(50), name varchar(50) ...)
      * @return - false or object result query
      */
-    abstract public function createTable($tableName, $propertys);
+    abstract public function createTable(string $tableName, array $columnDefinitions);
 
     /**
      * deleteDb - удаление строк из таблици

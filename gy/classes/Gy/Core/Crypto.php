@@ -27,15 +27,19 @@ final class Crypto
     }
 
     /**
+     * FIXME: Криптографически небезопасный генератор случайных строк. Заменить на более безопасный алгоритм.
      * getRandString - даст произвольную строку
      * @return string
      */
-    public function getRandString()
+    public function getRandString(): string
     {
         return md5(microtime().$this->salt);
     }
 
     /**
+     * FIXME: Выходит за пределы ответственности класса. Подобная функция должна быть в другом месте, например, в менеджере сессии.
+     * TODO: Создать менеджер сессии.
+     *
      * getStringForUserCookie - даст строку для пользовательской куки
      *  (склеит соль имя id пользователя и сделает md5)
      * @param string $login

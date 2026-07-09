@@ -347,14 +347,13 @@ class MySql extends Driver
     /**
      * createTable - создать таблицу в базе данных
      * @param string $tableName - имя таблицы
-     * @param array $propertys - параметры (приер  login varchar(50), name varchar(50) ...)
+     * @param array $columnDefinitions - параметры (приер  login varchar(50), name varchar(50) ...)
      * @return - false or object result query
      */
-    public function createTable($tableName, $propertys)
+    public function createTable($tableName, $columnDefinitions)
     {
-        $query = '';
         $textPropertys = '';
-        foreach ($propertys as $val) {
+        foreach ($columnDefinitions as $val) {
             $textPropertys .= ((!empty($textPropertys)) ? ',' : '') . ' ' . $val;
         }
 
@@ -397,6 +396,7 @@ class MySql extends Driver
         if (empty($this->configuration->databaseConfig['db_port'])) {
             $this->configuration->databaseConfig['db_port'] = ini_get("mysqli.default_port");
         }
+
         return $this->connect(
             $this->configuration->databaseConfig['db_host'],
             $this->configuration->databaseConfig['db_user'],

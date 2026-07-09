@@ -145,18 +145,16 @@ class ModuleManager
      * getModulesComponent
      *  - получить по имени компонента данные о компоненте из подключённых модулей
      *
-     * @param string $nameComponent
-     * @return string
+     * @param string $componentName
+     * @return string|null
      */
-    public function getModulesComponent($nameComponent)
+    public function getModulesComponent(string $componentName): ?string
     {
-        $result = false;
-
-        if (!empty($this->nameModuleByComponentName[$nameComponent])) {
-            $result = $this->arrayIncludeModules[$this->nameModuleByComponentName[$nameComponent]] . 'component/' . $nameComponent;
+        if (empty($this->nameModuleByComponentName[$componentName])) {
+            return null;
         }
 
-        return $result;
+        return $this->arrayIncludeModules[$this->nameModuleByComponentName[$componentName]] . 'component/' . $componentName;
     }
 
     /**

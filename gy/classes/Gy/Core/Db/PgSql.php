@@ -373,15 +373,15 @@ class PgSql extends Driver
     /**
      * createTable - создать таблицу в базе данных
      * @param string $tableName - имя таблицы
-     * @param array $propertys - параметры (приер  login varchar(50), name varchar(50) ...)
+     * @param array $columnDefinitions - параметры (приер  login varchar(50), name varchar(50) ...)
      * @return - false or object result query
      */
-    public function createTable($tableName, $propertys)
+    public function createTable($tableName, $columnDefinitions)
     {
         $query = '';
         $textPropertys = '';
 
-        foreach ($propertys as $val) {
+        foreach ($columnDefinitions as $val) {
             $strPos = strpos($val, 'int PRIMARY KEY AUTO_INCREMENT');
             if ($strPos !== false) {
                 $val = str_replace('int PRIMARY KEY AUTO_INCREMENT', 'SERIAL PRIMARY KEY', $val);

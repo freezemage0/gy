@@ -4,13 +4,13 @@ namespace Gy\Core;
 
 
 final class Localization {
-    private array $textLang; // тексты определённого языка
+    private ?array $dictionary = null; // тексты определённого языка
 
-    public function __construct($url, $fileName, $lang) {
-        if (!empty($url) && !empty($fileName) && !empty($lang)) {
-            //load array text language
-            $this->textLang = $this->loadMessages($url . '/lang_' . $fileName . '.php', $lang);
-        }
+    public function __construct(
+        private readonly string $url,
+        private readonly string $fileName,
+        private readonly string $lang
+    ) {
     }
 
     /**
@@ -21,19 +21,19 @@ final class Localization {
      * @param namePHPFile    - файл в котором будет вызываться данный класс // там где нужен языковой файл
      * @return
      */
-
     public function autoLoadLang($namePHPFile, $lang) {
 
     }
 
     /**
-     *  getMessage вернуть текст для заданной переменной текущего языка
-     *
-     * @param string $code - передать переменную
-     * @return вернёт текст или false
+     * Получает локализованный текст на основе константного обозначения.
      */
     public function getMessage(string $code): ?string {
-        return $this->textLang[$code] ?? null;
+        if ($this->dictionary === null) {
+            $this->dictionary = $this->loadMessages("{$this->url}/lang_{$this->fileName}.php", $this->lang);
+        }
+
+        return $this->dictionary[$code] ?? null;
     }
 
     /**
@@ -48,11 +48,13 @@ final class Localization {
         $mess = [];
 
         // если есть файл с языковыми параметрами
-        if (file_exists($urlFile) === true) {
-            include $urlFile;
-            if (!empty($mess[$lang])) {
-                $mess = $mess[$lang];
-            }
+        if (!\is_file($urlFile)) {
+            return $mess;
+        }
+
+        include $urlFile;
+        if (!empty($mess[$lang])) {
+            $mess = $mess[$lang];
         }
 
         return $mess;

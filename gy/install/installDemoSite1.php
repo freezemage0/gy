@@ -4,6 +4,7 @@
  * 
  */
 
+use Gy\Core\Container;
 use Gy\Modules\containerdata\Classes\ContainerData;
 
 global $argv;
@@ -42,8 +43,7 @@ if ($isRunConsole) {
 //            }
 
 
-            global $LANG; 
-            $lang = $LANG; // быстрый фикс, что бы заработало
+            $lang = Container::getInstance()->getConfiguration()->language;
 
             // записать основную страницу
             file_put_contents(__DIR__.'/../../index.php', getCodeByUrlPage('index.php', $lang));

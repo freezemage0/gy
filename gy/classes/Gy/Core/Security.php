@@ -1,10 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Gy\Core;
 
-if (!defined("GY_CORE") && (GY_CORE !== true)) die( "gy: err include core" );
-
-/** 
+/**
  * Security - класс с методами для обеспечения безопасности gy framework
  * class work security
  */
@@ -15,8 +14,8 @@ final class Security
      * filterInputData
      *  - фильтр входных данных, в присланных данных уберёт лишнее
      * 
-     * @param array/string $data - потенциально с вредоносом
-     * @return array/string - с большей частью вырезанным вредоносом
+     * @param array|string $data - потенциально с вредоносом
+     * @return array|string - с большей частью вырезанным вредоносом
      */
     public static function filterInputData(array|string $data): array|string
     {

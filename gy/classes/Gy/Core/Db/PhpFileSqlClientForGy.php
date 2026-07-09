@@ -202,10 +202,10 @@ class PhpFileSqlClientForGy extends Driver
     /** // TODO сделать PRIMARY KEY AUTO_INCREMENT
      * createTable - создать таблицу в базе данных
      * @param string $tableName - имя таблицы
-     * @param array $propertys - параметры (приер  login varchar(50), name varchar(50) ...) 
+     * @param array $columnDefinitions - параметры (приер  login varchar(50), name varchar(50) ...)
      * @return - false or object result query
      */
-    public function createTable($tableName, $propertys)
+    public function createTable($tableName, $columnDefinitions)
     {
         // сбросить данные предыдущего вызова метода select
         $this->clearResultMethodSelect();
@@ -214,7 +214,7 @@ class PhpFileSqlClientForGy extends Driver
         $arrayColumns = array();
 
         // нужно подогнать свойства под метод класса PhpFileSql
-        foreach ($propertys as $val) {
+        foreach ($columnDefinitions as $val) {
             $attr = explode(' ', $val);
             if( (count($attr)>2) 
                 && ($attr[1] == 'int' )

@@ -8,34 +8,34 @@ namespace Gy\Core\Contract\Cache;
 
 
 /**
- * cache - класс для работы с кешем
- * для даботы нужен раздел gy/cache/
+ * Предоставляет API для управления кэшированием.
  */
 interface CacheInterface
 {
     /**
-     * cacheInit - инициализация кеша, надо проверить есть кеш по заданным параметрам
      * @param string $key
      * @param int $expiresIn - время кеширования в секундах
+     *
      * @return bool
      */
     public function initialize(string $key, int $expiresIn): bool;
 
     /**
-     * getCacheData - получить данные из кеша
+     * Получает данные из кэша.
+     *
      * @return scalar|array - может быть массив или одиночное значение любого типа
      */
     public function getData(): int|string|bool|float|array;
 
     /**
-     * setCacheData - установить данные в кеш
-     * @param mixed $data - может быть массив или одиночное значение
-     * @return boolean true
+     * Записывает данные в кэш.
+     *
+     * @param scalar|array $data Скалярное значение.
      */
-    public function setData(mixed $data): void;
+    public function setData(int|string|bool|float|array $data): void;
 
     /**
-     * clearThisCache - удалит текущий кеш (кеш связанный с текущим объектом)
+     * Сбрасывает кэш.
      */
     public function clear(): void;
 }
